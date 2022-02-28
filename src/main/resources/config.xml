@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:annotation-config/>
+
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:application.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <bean id="compoundHelicopter" class="com.epam.codinggym.springcore.aircrafts.CompoundHelicopter">
+    </bean>
+
+    <bean abstract="true" id="basicAirplane">
+        <property name="distance" value="${distance}"/>
+    </bean>
+
+    <bean id="longRangeAirplane" class="com.epam.codinggym.springcore.aircrafts.LongRangeAirplane" parent="basicAirplane">
+    </bean>
+
+    <bean id="shortRangeAirplane" class="com.epam.codinggym.springcore.aircrafts.ShortRangeAirplane" parent="basicAirplane">
+    </bean>
+
+    <bean id="controlCenter" class="com.epam.codinggym.springcore.ControlCenter" init-method="init">
+        <constructor-arg>
+            <list>
+                <ref bean="longRangeAirplane"/>
+                <ref bean="shortRangeAirplane"/>
+                <ref bean="compoundHelicopter"/>
+                <value>#{T(com.epam.codinggym.springcore.aircrafts.BasicAirplane).canFly() ? shortRangeAirplane : longRangeAirplane}</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg value="${controlCenterMessage}"/>
+    </bean>
+</beans>
